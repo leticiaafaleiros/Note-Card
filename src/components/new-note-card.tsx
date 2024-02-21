@@ -8,7 +8,7 @@ interface NewNoteProps {
 }
 
 const SpeechRecognitionAPI =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
+  (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
 const speechRecognition = new SpeechRecognitionAPI();
 
@@ -61,15 +61,25 @@ export function NewNoteCard({ onNoteCreated }: NewNoteProps) {
     speechRecognition.maxAlternatives = 1;
     speechRecognition.interimResults = true;
 
-    speechRecognition.onresult = (event) => {
-      const transcription = Array.from(event.results).reduce((text, result) => {
-        return text.concat(result[0].transcript);
-      }, "");
+    // speechRecognition.onresult = (event: any) => {
+    //   const transcription = Array.from(event.results).reduce((text, result) => {
+    //     return text.concat(result[0].transcript);
+
+    //   }, "");
+
+    //   setContent(transcription);
+    // };
+
+    speechRecognition.onresult = (event: any) => {
+      let transcription = "";
+      for (let i = 0; i < event.results.length; i++) {
+        transcription += event.results[i][0].transcript;
+      }
 
       setContent(transcription);
     };
 
-    speechRecognition.onerror = (event) => {
+    speechRecognition.onerror = (event: any) => {
       console.error(event);
     };
 
